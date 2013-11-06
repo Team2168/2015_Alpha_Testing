@@ -21,7 +21,7 @@
 class Robot : public IterativeRobot {
 private:
 	LiveWindow *lw;
-	
+
 	//Joysticks Objects
 	Joystick *Driver;
 	Joystick *Operator;
@@ -35,26 +35,24 @@ private:
 	Talon *shooterRear;
 
 	//Shooter Double Solenoid
-	DoubleSolenoid *shooterFire;
+	Relay *shooterFire;
 
 	//Shooter Angle Solenoid
-	DoubleSolenoid *shooterAngle;
+	Relay *shooterAngle;
 
-	//Speed variables
-	//double leftSpeed;
-	//double rightSpeed;
+
 
 	virtual void RobotInit() {
 
 		/*
-		 * PWM 1 is left drive
-		 * PMW 2 is right drive
-		 * PWM 3 is shooter moter forward
-		 * PWM 4 is shooter moter rear.
-		 * Relay Chanel 1 is shooter raise
-		 * Relay Channel 2 is shooter lower
-		 * Relay Channel 3 is fire extend
-		 * Relay Channel 4 is fire retract.
+		 * PWM 1 = left drive
+		 * PMW 2 =  right drive
+		 * PWM 3 = shooter moter forward
+		 * PWM 4 = shooter moter rear.
+		 * Relay 1 is shooter raise
+		 * Relay 2 is shooter lower
+		 * Relay 3 is fire extend
+		 * Relay 4 is fire retract.
 		 *
 		 */
 
@@ -73,22 +71,23 @@ private:
 		shooterFWD = new Talon(3);
 		shooterRear = new Talon(4);
 
+
 		//initialize shooter angle
-		// shooterAngle = new DoubleSolenoid(1,2);
+		 shooterAngle = new Relay(1,Relay::kBothDirections);
 	}
-	
+
 	virtual void AutonomousInit() {
 
 	}
-	
+
 	virtual void AutonomousPeriodic() {
 
 	}
-	
+
 	virtual void TeleopInit() {
 
 	}
-	
+
 	virtual void TeleopPeriodic() {
 
 		rightDrive->SetSpeed(-(Driver->GetRawAxis(2)));
@@ -98,11 +97,16 @@ private:
 		shooterFWD->SetSpeed(-(Operator->GetRawAxis(5)));
 		shooterRear->SetSpeed(-(Operator->GetRawAxis(5)));
 
+		if(Driver->GetRawButton(5))
+			shooterAngle->Set(Relay::kForward);
+		else
+			shooterAngle->Set(Relay::kReverse);
+
 
 
 
 	}
-	
+
 	virtual void TestPeriodic() {
 		lw->Run();
 	}
