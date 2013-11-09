@@ -40,13 +40,18 @@ private:
 	//Shooter Angle Solenoid
 	Relay *shooterAngle;
 
+	//Compressor Relay
+	Relay *CompressorRelay;
+
+	//Switches
+	DigitalInput *CompressorSwitch;
 
 
 	virtual void RobotInit() {
 
 		/*
-		 * PWM 1 = left drive
-		 * PMW 2 =  right drive
+		 * PWM 9 = left drive
+		 * PMW 10 =  right drive
 		 * PWM 3 = shooter moter forward
 		 * PWM 4 = shooter moter rear.
 		 * Relay 1 is shooter raise
@@ -64,8 +69,8 @@ private:
 		Operator = new Joystick(2);
 
 		//Initialize drive talons
-		rightDrive = new Talon(1);
-		leftDrive = new Talon(2);
+		rightDrive = new Talon(9);
+		leftDrive = new Talon(10);
 
 		//initialize shooter talons
 		shooterFWD = new Talon(3);
@@ -74,6 +79,13 @@ private:
 
 		//initialize shooter angle
 		 shooterAngle = new Relay(1,Relay::kBothDirections);
+		 shooterFire = new Relay(2,Relay::kBothDirections);
+
+
+		 CompressorRelay = new Relay(3,Relay::kForwardOnly);
+
+		//initialize compressor switch
+		CompressorSwitch = new DigitalInput(10);
 	}
 
 	virtual void AutonomousInit() {
@@ -94,16 +106,42 @@ private:
 		leftDrive->SetSpeed((Driver->GetRawAxis(5)));
 
 
-		shooterFWD->SetSpeed(-(Operator->GetRawAxis(5)));
-		shooterRear->SetSpeed(-(Operator->GetRawAxis(5)));
+		shooterFWD->SetSpeed(-(Operator->GetRawAxis(2)));
+		shooterRear->SetSpeed(-(Operator->GetRawAxis(2)));
 
-		if(Driver->GetRawButton(5))
+
+		//shoioter angle
+		if(Operator->GetRawButton(5))
+		{
+			cout<<"Relay 1 forward"<<endl;
 			shooterAngle->Set(Relay::kForward);
-		else
+		}
+
+		if(Operator->GetRawButton(6))
+		{
+			cout<<"Relay 1 Reverse"<<endl;
 			shooterAngle->Set(Relay::kReverse);
+		}
 
 
+		//Fire button
+		if(Operator->GetRawButton(1))
+		{
+			cout<<"Relay 1 forward"<<endl;
+			shooterFire->Set(Relay::kForward);
+		}
 
+		if(Operator->GetRawButton(2))
+		{
+			cout<<"Relay 1 Reverse"<<endl;
+			shooterFire->Set(Relay::kReverse);
+		}
+
+		if(CompressorSwitch->Get() == 0){
+			CompressorRelay->Set(Relay::kForward);
+		}else{
+			CompressorRelay->Set(Relay::kOff);
+		}
 
 	}
 
