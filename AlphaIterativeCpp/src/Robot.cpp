@@ -16,11 +16,14 @@
 
 #include "WPILib.h"
 #include "Joystick.h"
-
+#include "Can/PDP.h"
 
 class Robot : public IterativeRobot {
-private:
+public:
 	LiveWindow *lw;
+
+	//Can Objects
+	//PDP *canPDP;
 
 	//Joysticks Objects
 	Joystick *Driver;
@@ -46,6 +49,17 @@ private:
 	//Switches
 	DigitalInput *CompressorSwitch;
 
+	//Reference parms
+	double Voltage;
+
+	//FLAGS
+	//bool autoFinished;
+
+	UINT8 chan;
+
+	//Robot(){
+	//		canPDP = 0;
+	//}
 
 	virtual void RobotInit() {
 
@@ -86,10 +100,55 @@ private:
 
 		//initialize compressor switch
 		CompressorSwitch = new DigitalInput(10);
+
+		//;can init
+		Voltage = 0;
+
+		//PDP objects
+		//canPDP = new PDP();
+
+		chan = 1;
 	}
 
 	virtual void AutonomousInit() {
 
+		shooterAngle->Set(Relay::kForward);
+		rightDrive->SetSpeed(0);
+		leftDrive->SetSpeed(0);
+
+		shooterFWD->SetSpeed(1);
+		shooterRear->SetSpeed(1);
+		sleep(4);
+		cout << "BEGIN" << endl;
+		shooterFire->Set(Relay::kForward);
+		sleep(1);
+		shooterFire->Set(Relay::kReverse);
+		sleep(1);
+
+		//nanosleep(6);
+
+		shooterFire->Set(Relay::kForward);
+		sleep(1);
+		shooterFire->Set(Relay::kReverse);
+		sleep(1);
+
+		shooterFire->Set(Relay::kForward);
+		sleep(1);
+		shooterFire->Set(Relay::kReverse);
+		sleep(1);
+
+		shooterFire->Set(Relay::kForward);
+		sleep(1);
+		shooterFire->Set(Relay::kReverse);
+		sleep(2);
+
+		shooterFWD->SetSpeed(0);
+		shooterRear->SetSpeed(0);
+
+		sleep(2);
+		shooterAngle->Set(Relay::kReverse);
+
+		cout << "END" << endl;
 	}
 
 	virtual void AutonomousPeriodic() {
@@ -142,6 +201,13 @@ private:
 		}else{
 			CompressorRelay->Set(Relay::kOff);
 		}
+
+		//if(canPDP == 0){
+		//	cout << "NULL" << endl;
+		//}else{
+			//canPDP->GetVoltage(Voltage) ;
+			//cout << "0" << endl;
+		//}
 
 	}
 
